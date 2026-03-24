@@ -1,9 +1,9 @@
 {
     "name": "st-minimal-tokens",
     "display_name": "Minimal Token Tracker",
-    "version": "1.2.1",
-    "description": "Только число токенов. С защитой от потери.",
-    "author": "MicroCot/ Sunrize Edit",
+    "version": "1.3.0",
+    "description": "Только число токенов потраченных в чате.",
+    "author": "Sunrize / Edit",
     "loading_order": 20,
     "js": "index.js",
     "css": "style.css"
