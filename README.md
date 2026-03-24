@@ -1,2 +1,2 @@
 # Tokens-Count
-Token counter in SillyTavern, inspired by and based on: https://github.com/SunKatz05/Chat-Tracker-ST
+Token counter (very minimalistic) in SillyTavern, based on: https://github.com/SunKatz05/Chat-Tracker-ST
