@@ -23,7 +23,11 @@
     // Перетаскивание (поддержка мыши и сенсора)
     function setupDraggable(el) {
         const onStart = (e) => {
-            // Начинаем перетаскивание
+            // Останавливаем всплытие, чтобы не активировать другие элементы интерфейса
+            e.stopPropagation();
+            // Предотвращаем стандартное поведение (выделение текста, скролл и т.п.)
+            e.preventDefault();
+
             isDragging = true;
             el.classList.add('dragging');
 
@@ -36,7 +40,6 @@
             initialLeft = rect.left;
             initialTop = rect.top;
 
-            // Сбрасываем right/bottom, чтобы позиционирование было по left/top
             el.style.right = 'auto';
             el.style.bottom = 'auto';
 
@@ -49,6 +52,7 @@
         const onMove = (e) => {
             if (!isDragging) return;
             e.preventDefault();
+            e.stopPropagation();
 
             const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
             const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
@@ -57,7 +61,8 @@
             el.style.top = (initialTop + (clientY - startY)) + 'px';
         };
 
-        const onEnd = () => {
+        const onEnd = (e) => {
+            if (!isDragging) return;
             isDragging = false;
             panelElement.classList.remove('dragging');
             savePosition(panelElement);
@@ -69,7 +74,7 @@
         };
 
         el.addEventListener('mousedown', onStart);
-        el.addEventListener('touchstart', onStart, { passive: true });
+        el.addEventListener('touchstart', onStart, { passive: false });
     }
 
     // Сохранение позиции
@@ -98,7 +103,6 @@
                 return;
             }
 
-            // Собираем текст из всех видимых сообщений (исключаем скрытые и системные)
             const messages = context.chat.filter(msg => !msg.extra?.hidden && !msg.is_system);
             const fullText = messages.map(msg => msg.mes).join('\n');
             const tokenCount = context.getTokenCount(fullText) || 0;
@@ -114,7 +118,6 @@
     jQuery(async function() {
         createPanel();
 
-        // Ждём готовности SillyTavern
         const waitForST = setInterval(() => {
             if (typeof SillyTavern !== 'undefined' && SillyTavern.getContext()?.chat) {
                 updateTokenCount();
@@ -122,7 +125,6 @@
             }
         }, 1000);
 
-        // Обновляем каждые 3 секунды (достаточно для отслеживания изменений)
         setInterval(updateTokenCount, 3000);
     });
 })();
