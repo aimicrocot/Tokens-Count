@@ -23,6 +23,7 @@
     // Перетаскивание (поддержка мыши и сенсора)
     function setupDraggable(el) {
         const onStart = (e) => {
+            // Начинаем перетаскивание
             isDragging = true;
             el.classList.add('dragging');
 
@@ -35,6 +36,7 @@
             initialLeft = rect.left;
             initialTop = rect.top;
 
+            // Сбрасываем right/bottom, чтобы позиционирование было по left/top
             el.style.right = 'auto';
             el.style.bottom = 'auto';
 
@@ -85,26 +87,45 @@
         if (saved.left) el.style.left = saved.left;
     }
 
-    // Отображение плашки только на странице чата
-    function setPanelVisibility() {
-        if (!panelElement) return;
-        try {
-            const context = SillyTavern.getContext();
-            // context.page содержит название текущей страницы (chat, character, settings и т.д.)
-            const currentPage = context.page;
-            const shouldShow = (currentPage === 'chat');
-            panelElement.style.display = shouldShow ? '' : 'none';
-        } catch(e) {
-            // Если не удалось определить страницу, скрываем плашку
-            panelElement.style.display = 'none';
-        }
-    }
-
     // Подсчёт токенов в текущем чате
     function updateTokenCount() {
         if (!tokenValueSpan) return;
 
         try {
+            const context = SillyTavern.getContext();
+            if (!context || !context.chat) {
+                tokenValueSpan.textContent = '0';
+                return;
+            }
+
+            // Собираем текст из всех видимых сообщений (исключаем скрытые и системные)
+            const messages = context.chat.filter(msg => !msg.extra?.hidden && !msg.is_system);
+            const fullText = messages.map(msg => msg.mes).join('\n');
+            const tokenCount = context.getTokenCount(fullText) || 0;
+
+            tokenValueSpan.textContent = tokenCount.toLocaleString();
+        } catch (err) {
+            console.warn('Token Tracker: не удалось подсчитать токены', err);
+            tokenValueSpan.textContent = '?';
+        }
+    }
+
+    // Инициализация после загрузки страницы и готовности ST
+    jQuery(async function() {
+        createPanel();
+
+        // Ждём готовности SillyTavern
+        const waitForST = setInterval(() => {
+            if (typeof SillyTavern !== 'undefined' && SillyTavern.getContext()?.chat) {
+                updateTokenCount();
+                clearInterval(waitForST);
+            }
+        }, 1000);
+
+        // Обновляем каждые 3 секунды (достаточно для отслеживания изменений)
+        setInterval(updateTokenCount, 3000);
+    });
+})();
             const context = SillyTavern.getContext();
             if (!context || !context.chat) {
                 tokenValueSpan.textContent = '0';
