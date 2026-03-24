@@ -1,53 +1,34 @@
 (function() {
     let isDragging = false;
     let startX, startY, initialLeft, initialTop;
+    let panelElement = null;
+    let tokenValueSpan = null;
 
+    // Создание плашки
     function createPanel() {
-        if (document.getElementById('token-tracker-min')) return;
+        if (document.getElementById('token-tracker-panel')) return;
 
-        const panel = document.createElement('div');
-        panel.id = 'token-tracker-min';
-        panel.className = 'token-tracker-min';
-        // Только число, ничего больше
-        panel.innerHTML = `<span id="tokens-val">0</span>`;
-        
-        document.body.appendChild(panel);
-        
-        setupDraggable(panel);
-        loadPosition(panel);
-        
-        // Запуск обновлений
-        updateDisplay();
-        setInterval(updateDisplay, 3000);
+        panelElement = document.createElement('div');
+        panelElement.id = 'token-tracker-panel';
+        panelElement.className = 'token-tracker-panel';
+        panelElement.innerHTML = `<span id="token-count">0</span>`;
+        document.body.appendChild(panelElement);
+
+        tokenValueSpan = document.getElementById('token-count');
+
+        setupDraggable(panelElement);
+        loadPosition(panelElement);
     }
 
-    function updateDisplay() {
-        try {
-            const context = SillyTavern.getContext();
-            if (!context || !context.chat) return;
-            
-            // Считаем только текстовые сообщения в чате (без скрытых и системных)
-            const text = context.chat
-                .filter(m => !m.extra?.hidden && !m.is_system)
-                .map(m => m.mes)
-                .join("\n");
-            
-            const count = context.getTokenCount(text) || 0;
-            const valEl = document.getElementById('tokens-val');
-            if (valEl) valEl.textContent = count.toLocaleString();
-        } catch (e) {
-            // Тихо игнорируем ошибки, если контекст еще не прогрузился
-        }
-    }
-
+    // Перетаскивание (поддержка мыши и сенсора)
     function setupDraggable(el) {
         const onStart = (e) => {
+            // Начинаем перетаскивание
             isDragging = true;
             el.classList.add('dragging');
-            
+
             const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
             const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
-
             startX = clientX;
             startY = clientY;
 
@@ -55,6 +36,7 @@
             initialLeft = rect.left;
             initialTop = rect.top;
 
+            // Сбрасываем right/bottom, чтобы позиционирование было по left/top
             el.style.right = 'auto';
             el.style.bottom = 'auto';
 
@@ -66,6 +48,8 @@
 
         const onMove = (e) => {
             if (!isDragging) return;
+            e.preventDefault();
+
             const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
             const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
 
@@ -75,8 +59,9 @@
 
         const onEnd = () => {
             isDragging = false;
-            el.classList.remove('dragging');
-            savePosition(el);
+            panelElement.classList.remove('dragging');
+            savePosition(panelElement);
+
             document.removeEventListener('mousemove', onMove);
             document.removeEventListener('mouseup', onEnd);
             document.removeEventListener('touchmove', onMove);
@@ -87,43 +72,57 @@
         el.addEventListener('touchstart', onStart, { passive: true });
     }
 
+    // Сохранение позиции
     function savePosition(el) {
-        localStorage.setItem('st_min_tokens_pos', JSON.stringify({
+        localStorage.setItem('tokenTracker_pos', JSON.stringify({
             top: el.style.top,
             left: el.style.left
         }));
     }
 
+    // Загрузка позиции
     function loadPosition(el) {
-        const saved = JSON.parse(localStorage.getItem('st_min_tokens_pos') || '{}');
-        if (saved.top) {
-            el.style.top = saved.top;
-            el.style.left = saved.left;
-        } else {
-            // Дефолтная позиция, если ничего не сохранено
-            el.style.top = '20px';
-            el.style.left = '20px';
+        const saved = JSON.parse(localStorage.getItem('tokenTracker_pos') || '{}');
+        if (saved.top) el.style.top = saved.top;
+        if (saved.left) el.style.left = saved.left;
+    }
+
+    // Подсчёт токенов в текущем чате
+    function updateTokenCount() {
+        if (!tokenValueSpan) return;
+
+        try {
+            const context = SillyTavern.getContext();
+            if (!context || !context.chat) {
+                tokenValueSpan.textContent = '0';
+                return;
+            }
+
+            // Собираем текст из всех видимых сообщений (исключаем скрытые и системные)
+            const messages = context.chat.filter(msg => !msg.extra?.hidden && !msg.is_system);
+            const fullText = messages.map(msg => msg.mes).join('\n');
+            const tokenCount = context.getTokenCount(fullText) || 0;
+
+            tokenValueSpan.textContent = tokenCount.toLocaleString();
+        } catch (err) {
+            console.warn('Token Tracker: не удалось подсчитать токены', err);
+            tokenValueSpan.textContent = '?';
         }
     }
 
-    // Инициализация через jQuery, как в рабочем примере
-    jQuery(function() {
-        const check = setInterval(() => {
-            if (typeof SillyTavern !== 'undefined' && SillyTavern.getContext()?.chat) {
-                createPanel();
-                clearInterval(check);
-            }
-        }, 1000);
-    });
-})();
+    // Инициализация после загрузки страницы и готовности ST
+    jQuery(async function() {
+        createPanel();
 
-    // Инициализация через jQuery, как в рабочем примере
-    jQuery(function() {
-        const check = setInterval(() => {
+        // Ждём готовности SillyTavern
+        const waitForST = setInterval(() => {
             if (typeof SillyTavern !== 'undefined' && SillyTavern.getContext()?.chat) {
-                createPanel();
-                clearInterval(check);
+                updateTokenCount();
+                clearInterval(waitForST);
             }
         }, 1000);
+
+        // Обновляем каждые 3 секунды (достаточно для отслеживания изменений)
+        setInterval(updateTokenCount, 3000);
     });
 })();
