@@ -3,7 +3,7 @@
     "display_name": "Minimal Token Tracker",
     "version": "1.2.1",
     "description": "Только число токенов. С защитой от потери.",
-    "author": "Sunrize / Edit",
+    "author": "MicroCot/ Sunrize Edit",
     "loading_order": 20,
     "js": "index.js",
     "css": "style.css"
