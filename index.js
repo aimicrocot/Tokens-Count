@@ -23,7 +23,6 @@
     // Перетаскивание (поддержка мыши и сенсора)
     function setupDraggable(el) {
         const onStart = (e) => {
-            // Начинаем перетаскивание
             isDragging = true;
             el.classList.add('dragging');
 
@@ -36,7 +35,6 @@
             initialLeft = rect.left;
             initialTop = rect.top;
 
-            // Сбрасываем right/bottom, чтобы позиционирование было по left/top
             el.style.right = 'auto';
             el.style.bottom = 'auto';
 
@@ -87,6 +85,21 @@
         if (saved.left) el.style.left = saved.left;
     }
 
+    // Отображение плашки только на странице чата
+    function setPanelVisibility() {
+        if (!panelElement) return;
+        try {
+            const context = SillyTavern.getContext();
+            // context.page содержит название текущей страницы (chat, character, settings и т.д.)
+            const currentPage = context.page;
+            const shouldShow = (currentPage === 'chat');
+            panelElement.style.display = shouldShow ? '' : 'none';
+        } catch(e) {
+            // Если не удалось определить страницу, скрываем плашку
+            panelElement.style.display = 'none';
+        }
+    }
+
     // Подсчёт токенов в текущем чате
     function updateTokenCount() {
         if (!tokenValueSpan) return;
@@ -98,7 +111,6 @@
                 return;
             }
 
-            // Собираем текст из всех видимых сообщений (исключаем скрытые и системные)
             const messages = context.chat.filter(msg => !msg.extra?.hidden && !msg.is_system);
             const fullText = messages.map(msg => msg.mes).join('\n');
             const tokenCount = context.getTokenCount(fullText) || 0;
@@ -122,7 +134,14 @@
             }
         }, 1000);
 
-        // Обновляем каждые 3 секунды (достаточно для отслеживания изменений)
+        // Регулярное обновление токенов (каждые 3 секунды)
         setInterval(updateTokenCount, 3000);
+
+        // Следим за сменой страницы, чтобы показывать/скрывать плашку
+        if (typeof SillyTavern !== 'undefined') {
+            $(document).on('SillyTavern:page-changed', setPanelVisibility);
+            // Первоначальная проверка видимости
+            setTimeout(setPanelVisibility, 500);
+        }
     });
 })();
