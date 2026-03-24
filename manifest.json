@@ -1,13 +1,9 @@
 {
-    "name": "Simple Token Tracker",
-    "description": "Отображает только плашку с количеством потраченных токенов.",
-    "version": "1.0.0",
-    "author": "YourName",
-    "scripts": [
-        "index.js"
-    ],
-    "css": [
-        "style.css"
-    ],
-    "dependencies": []
+    "name": "chat-tracker",
+    "display_name": "Simple Token Tracker",
+    "version": "1.1.0",
+    "description": "Minimal floating token display",
+    "author": "User",
+    "js": "index.js",
+    "css": "style.css"
 }
