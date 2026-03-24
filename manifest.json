@@ -2,10 +2,9 @@
     "name": "st-token-tracker",
     "display_name": "Token Tracker",
     "version": "1.1.0",
-    "description": "Минималистичная плашка для отслеживания потраченных токенов в контексте.",
+    "description": "Компактная плашка отслеживания токенов (API и Chat).",
     "author": "Sunrize / Edit",
     "loading_order": 20,
     "js": "index.js",
-    "css": "style.css",
-    "homePage": "https://github.com/SillyTavern/Extension-ChatTracker"
+    "css": "style.css"
 }
