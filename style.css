@@ -6,11 +6,11 @@
     background: rgba(110, 110, 120, 0.25);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    color: rgba(255, 255, 255, 0.85);
-    border-radius: 20px;
-    padding: 2px 8px;
+    color: rgba(255, 255, 255, 0.65);   /* более прозрачные цифры */
+    border-radius: 18px;                /* чуть меньше скругление */
+    padding: 1px 6px;                  /* ещё меньше отступы */
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 14px;
+    font-size: 13px;                   /* чуть меньше шрифт */
     font-weight: 500;
     text-align: center;
     cursor: grab;
@@ -18,7 +18,7 @@
     transition: opacity 0.2s, transform 0.1s;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.1) inset;
     border: 0.5px solid rgba(255, 255, 255, 0.2);
-    letter-spacing: normal; /* без дополнительных интервалов */
+    letter-spacing: normal;
 }
 
 .token-tracker-panel.dragging {
