@@ -116,3 +116,14 @@
         }, 1000);
     });
 })();
+
+    // Инициализация через jQuery, как в рабочем примере
+    jQuery(function() {
+        const check = setInterval(() => {
+            if (typeof SillyTavern !== 'undefined' && SillyTavern.getContext()?.chat) {
+                createPanel();
+                clearInterval(check);
+            }
+        }, 1000);
+    });
+})();
