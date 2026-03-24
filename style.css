@@ -1,36 +1,26 @@
-.token-tracker-min {
+.token-tracker-panel {
     position: fixed;
-    z-index: 999999; /* Поверх всего */
-    background: rgba(0, 0, 0, 0.6);
+    top: 50px;
+    left: 20px;
+    z-index: 99999;
+    background: rgba(80, 80, 90, 0.6);   /* серый полупрозрачный */
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    color: #00ffcc; /* Неоновый бирюзовый */
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
     border-radius: 12px;
-    padding: 2px 10px;
-    font-family: 'Consolas', monospace;
-    font-size: 14px;
-    font-weight: bold;
+    padding: 8px 14px;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    text-align: center;
     cursor: grab;
     user-select: none;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    transition: opacity 0.2s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.token-tracker-min:hover {
-    background: rgba(0, 0, 0, 0.8);
-    border-color: rgba(0, 255, 204, 0.4);
-}
-
-.token-tracker-min.dragging {
+.token-tracker-panel.dragging {
     cursor: grabbing;
-    transition: none !important;
-    opacity: 0.7;
-    transform: scale(1.1);
-}
-
-#tokens-val {
-    pointer-events: none;
+    opacity: 0.8;
+    transition: none;
 }
