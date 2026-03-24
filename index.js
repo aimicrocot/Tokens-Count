@@ -2,38 +2,39 @@
     let isDragging = false;
     let startX, startY, initialLeft, initialTop;
 
-    // Создание плашки
     function createMinimalPanel() {
         if (document.getElementById('min-token-tracker')) return;
 
         const panel = document.createElement('div');
         panel.id = 'min-token-tracker';
         panel.className = 'min-token-tracker';
-        panel.innerHTML = `<span id="min-token-count">0</span>`;
+        panel.innerHTML = `<span id="min-token-count">...</span>`;
         
         document.body.appendChild(panel);
-        setupDraggable(panel);
-        loadPosition(panel);
         
-        // Запуск обновлений
+        setupDraggable(panel);
+        loadPosition(panel); // Загружаем позицию
+        ensureVisible(panel); // Проверяем, что она не за экраном
+        
         updateCount();
         setInterval(updateCount, 3000);
 
-        // Слушаем события SillyTavern для мгновенного обновления
-        const eventSource = SillyTavern.getContext()?.eventSource;
-        if (eventSource) {
-            const events = ['message_sent', 'message_received', 'chat_changed', 'generation_ended'];
-            events.forEach(event => eventSource.on(event, () => setTimeout(updateCount, 500)));
-        }
+        // Слушаем события для мгновенного обновления
+        try {
+            const eventSource = SillyTavern.getContext()?.eventSource;
+            if (eventSource) {
+                eventSource.on('message_sent', () => setTimeout(updateCount, 500));
+                eventSource.on('message_received', () => setTimeout(updateCount, 500));
+                eventSource.on('chat_changed', () => setTimeout(updateCount, 200));
+            }
+        } catch(e) { console.log("Token Tracker: EventSource not ready"); }
     }
 
-    // Подсчет токенов (текущий контекст чата)
     function updateCount() {
         try {
             const context = SillyTavern.getContext();
             if (!context || !context.chat) return;
             
-            // Считаем токены всех видимых сообщений
             const text = context.chat
                 .filter(m => !m.extra?.hidden && !m.is_system)
                 .map(m => m.mes)
@@ -42,12 +43,9 @@
             const count = context.getTokenCount(text) || 0;
             const el = document.getElementById('min-token-count');
             if (el) el.textContent = count.toLocaleString();
-        } catch (e) {
-            console.error('Token update error:', e);
-        }
+        } catch (e) {}
     }
 
-    // Логика перемещения
     function setupDraggable(el) {
         const onStart = (e) => {
             isDragging = true;
@@ -70,6 +68,7 @@
 
         const onMove = (e) => {
             if (!isDragging) return;
+            if (e.type === 'touchmove') e.preventDefault();
             const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
             const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
             el.style.left = (initialLeft + (clientX - startX)) + 'px';
@@ -91,53 +90,41 @@
     }
 
     function savePosition(el) {
-        localStorage.setItem('minTokenPos', JSON.stringify({ top: el.style.top, left: el.style.left }));
+        localStorage.setItem('minTokenPos_v2', JSON.stringify({ top: el.style.top, left: el.style.left }));
     }
 
     function loadPosition(el) {
-        const saved = JSON.parse(localStorage.getItem('minTokenPos') || '{}');
-        if (saved.top) el.style.top = saved.top;
-        if (saved.left) el.style.left = saved.left;
-    }
-
-    // Старт
-    jQuery(function() {
-        const check = setInterval(() => {
-            if (typeof SillyTavern !== 'undefined' && SillyTavern.getContext()?.chat) {
-                createMinimalPanel();
-                clearInterval(check);
-            }
-        }, 1000);
-    });
-})();
-        const res = prompt("Limit:", maxTokens);
-        if (res !== null && !isNaN(parseInt(res))) {
-            maxTokens = parseInt(res);
-            localStorage.setItem('tokenTrackerMaxTokens', maxTokens);
-            updateDisplay();
+        const saved = JSON.parse(localStorage.getItem('minTokenPos_v2') || '{}');
+        if (saved.top && saved.left) {
+            el.style.top = saved.top;
+            el.style.left = saved.left;
+        } else {
+            el.style.top = '100px';
+            el.style.left = '20px';
         }
     }
 
-    function savePosition(el) {
-        localStorage.setItem('tokenTracker_pos', JSON.stringify({
-            top: el.style.top,
-            left: el.style.left,
-            collapsed: isCollapsed
-        }));
+    // Если плашка случайно ушла за границы, возвращаем её
+    function ensureVisible(el) {
+        const rect = el.getBoundingClientRect();
+        if (rect.top < 0 || rect.left < 0 || rect.top > window.innerHeight || rect.left > window.innerWidth) {
+            el.style.top = '100px';
+            el.style.left = '20px';
+        }
     }
 
-    function loadPosition(el) {
-        const saved = JSON.parse(localStorage.getItem('tokenTracker_pos') || '{}');
-        if (saved.top) el.style.top = saved.top;
-        if (saved.left) el.style.left = saved.left;
-        isCollapsed = localStorage.getItem('tokenTracker_collapsed') === 'true';
-        el.classList.toggle('collapsed', isCollapsed);
+    // Инициализация при загрузке страницы
+    if (document.readyState === 'complete') {
+        createMinimalPanel();
+    } else {
+        window.addEventListener('load', createMinimalPanel);
     }
-
-    // Инициализация
-    jQuery(async function() {
-        createPanel();
-        const check = setInterval(() => {
+    
+    // Резервный запуск через jQuery (SillyTavern это любит)
+    jQuery(() => {
+        setTimeout(createMinimalPanel, 1000);
+    });
+})();
             if (typeof SillyTavern !== 'undefined' && SillyTavern.getContext()?.chat) {
                 updateDisplay();
                 clearInterval(check);
