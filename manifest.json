@@ -1,9 +1,11 @@
 {
-    "name": "chat-tracker",
-    "display_name": "Simple Token Tracker",
+    "name": "st-token-tracker",
+    "display_name": "Token Tracker",
     "version": "1.1.0",
-    "description": "Minimal floating token display",
-    "author": "User",
+    "description": "Минималистичная плашка для отслеживания потраченных токенов в контексте.",
+    "author": "Sunrize / Edit",
+    "loading_order": 20,
     "js": "index.js",
-    "css": "style.css"
+    "css": "style.css",
+    "homePage": "https://github.com/SillyTavern/Extension-ChatTracker"
 }
