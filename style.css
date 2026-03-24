@@ -1,34 +1,36 @@
-.min-token-tracker {
+.token-tracker-min {
     position: fixed;
-    top: 100px;
-    left: 20px;
-    z-index: 999999 !important; /* Еще выше */
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    color: #00ffcc;
-    border: 1px solid rgba(0, 255, 204, 0.3);
-    border-radius: 20px;
-    padding: 4px 14px;
-    font-family: 'Consolas', 'Monaco', monospace;
+    z-index: 999999; /* Поверх всего */
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #00ffcc; /* Неоновый бирюзовый */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 2px 10px;
+    font-family: 'Consolas', monospace;
     font-size: 14px;
     font-weight: bold;
     cursor: grab;
     user-select: none;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 50px;
-    pointer-events: auto !important;
 }
 
-.min-token-tracker.dragging {
+.token-tracker-min:hover {
+    background: rgba(0, 0, 0, 0.8);
+    border-color: rgba(0, 255, 204, 0.4);
+}
+
+.token-tracker-min.dragging {
     cursor: grabbing;
-    opacity: 0.8;
+    transition: none !important;
+    opacity: 0.7;
     transform: scale(1.1);
 }
 
-#min-token-count {
+#tokens-val {
     pointer-events: none;
 }
