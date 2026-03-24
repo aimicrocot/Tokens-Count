@@ -1,0 +1,13 @@
+{
+    "name": "Simple Token Tracker",
+    "description": "Отображает только плашку с количеством потраченных токенов.",
+    "version": "1.0.0",
+    "author": "YourName",
+    "scripts": [
+        "index.js"
+    ],
+    "css": [
+        "style.css"
+    ],
+    "dependencies": []
+}

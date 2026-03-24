@@ -1,0 +1,27 @@
+#simple-token-tracker {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #24282a;
+    color: #8da197;
+    padding: 15px;
+    border-radius: 10px;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    text-align: center;
+    border: 1px solid #363b3d;
+}
+
+#simple-token-tracker .tracker-title {
+    margin-bottom: 5px;
+    letter-spacing: 1px;
+    color: #6a8c7b;
+}
+
+#simple-token-tracker .tracker-values {
+    font-size: 16px;
+    color: #9ab4a5;
+}
