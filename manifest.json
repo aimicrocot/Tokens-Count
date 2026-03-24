@@ -1,9 +1,9 @@
 {
     "name": "st-token-tracker",
-    "display_name": "Token Tracker",
-    "version": "1.2.0",
+    "display_name": "Mini Token Tracker",
+    "version": "1.0.0",
     "description": "Плавающая плашка с количеством токенов в чате.",
-    "author": "Sunrize / Edit",
+    "author": "MicroCot / Sunrize Based",
     "loading_order": 20,
     "js": "index.js",
     "css": "style.css"
