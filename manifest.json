@@ -1,9 +1,9 @@
 {
-    "name": "st-token-tracker",
-    "display_name": "Token Tracker",
-    "version": "1.1.0",
-    "description": "Компактная плашка отслеживания токенов (API и Chat).",
-    "author": "Sunrize / Edit",
+    "name": "st-minimal-tokens",
+    "display_name": "Minimal Token Tracker",
+    "version": "1.2.0",
+    "description": "Только число токенов. Ничего лишнего.",
+    "author": "MicroCot",
     "loading_order": 20,
     "js": "index.js",
     "css": "style.css"
