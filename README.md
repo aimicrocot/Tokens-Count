@@ -20,7 +20,7 @@ Copy the repository link and add the extension via the SillyTavern extensions me
 
 ### Contacts
 
-My Telegram-channel @sillytavern1
+My Telegram-channel [@sillytavern1](https://t.me/sillytavern1)
 
 ### Credits
 
@@ -46,7 +46,7 @@ https://github.com/SunKatz05/Chat-Tracker-ST</details>
 
 ### Контакты
 
-Мой Телеграм-канал @sillytavern1
+Мой Телеграм-канал [@sillytavern1](https://t.me/sillytavern1)
 
 ### Кредиты
 
