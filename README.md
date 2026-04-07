@@ -28,6 +28,8 @@ My Telegram-channel @sillytavern1
 This extension is based on Chat-Tracker-ST by SunKatz05  
 https://github.com/SunKatz05/Chat-Tracker-ST</details>
 
+## Прочти меня
+
 ### О расширении
 
 Самый минималистичный счётчик токенов для SillyTavern.  
