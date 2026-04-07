@@ -1,4 +1,4 @@
-# Token-counter for SillyTavern
+# Token Count for SillyTavern
 
 ## Eng ReadMe
 <details>
