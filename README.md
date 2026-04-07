@@ -5,7 +5,7 @@
 
 ### About
 
-The most minimalistic token counter for SillyTavern.  
+The most minimalistic token counter for SillyTavern (from those I saw).
 Shows only one number — the number of tokens consumed in the chat context.
 
 ### Features
@@ -31,7 +31,7 @@ https://github.com/SunKatz05/Chat-Tracker-ST</details>
 
 ### О расширении
 
-Самый минималистичный счётчик токенов для SillyTavern.  
+Самый минималистичный счётчик токенов (из увиденных мной) для SillyTavern.  
 Показывает только одно число — количество токенов, потраченных в контексте чата.
 
 ### Особенности
