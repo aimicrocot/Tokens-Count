@@ -20,11 +20,11 @@ Copy the repository link and add the extension via the SillyTavern extensions me
 
 ### Contacts
 
-My Telegram-channel [@sillytavern1](https://t.me/sillytavern1)
+My Telegram-channel: [@sillytavern1](https://t.me/sillytavern1)
 
 ### Credits
 
-This extension is based on Chat-Tracker-ST by SunKatz05  
+This extension is based on Chat-Tracker-ST by SunKatz05:
 https://github.com/SunKatz05/Chat-Tracker-ST</details>
 
 ## Прочти меня
@@ -46,8 +46,9 @@ https://github.com/SunKatz05/Chat-Tracker-ST</details>
 
 ### Контакты
 
-Мой Телеграм-канал [@sillytavern1](https://t.me/sillytavern1)
+Мой Телеграм-канал: [@sillytavern1](https://t.me/sillytavern1)
 
 ### Кредиты
 
-Расширение базируется на Chat-Tracker-ST от SunKatz05 https://github.com/SunKatz05/Chat-Tracker-ST
+Расширение базируется на Chat-Tracker-ST от SunKatz05: 
+https://github.com/SunKatz05/Chat-Tracker-ST
