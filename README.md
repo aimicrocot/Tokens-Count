@@ -10,8 +10,7 @@ Shows only one number — the number of tokens consumed in the chat context.
 
 ### Features
 
-- One number — the total token count in the chat.
-- A semi-transparent rounded capsule in a glassmorphism style — unobtrusive and easy to move around.
+- A small semi-transparent rounded capsule in a glassmorphism style — unobtrusive and easy to move around.
 - Minimalism — no extra elements, just the counter.
 - Draggable in any section of SillyTavern.
 
@@ -37,8 +36,7 @@ https://github.com/SunKatz05/Chat-Tracker-ST</details>
 
 ### Особенности
 
-- Одно число — общее количество токенов в чате.
-- Полупрозрачная скруглённая капсула в стиле глассморфизм — не отвлекает, легко перемещается.
+- Маленькая и полупрозрачная скруглённая капсула в стиле глассморфизм — не отвлекает, легко перемещается.
 - Минимализм — никаких лишних элементов, только счётчик.
 - Перетаскивание в любом разделе SillyTavern.
 
