@@ -6,12 +6,12 @@
 ### About
 
 The most minimalistic token counter for SillyTavern (from those I saw).
-Shows only one number — the number of tokens consumed in the chat context.
+Shows only one number, the number of tokens consumed in the chat context.
 
 ### Features
 
-- A small semi-transparent rounded capsule in a glassmorphism style — unobtrusive and easy to move around.
-- Minimalism — no extra elements, just the counter.
+- A small semi-transparent rounded capsule in a glassmorphism style, unobtrusive and easy to move around.
+- Minimalism, no extra elements, just the counter.
 - Draggable in any section of SillyTavern.
 
 ### Installation
@@ -32,12 +32,12 @@ https://github.com/SunKatz05/Chat-Tracker-ST</details>
 ### О расширении
 
 Самый минималистичный счётчик токенов (из встреченных мной) для SillyTavern.  
-Показывает только одно число — количество токенов, потраченных в контексте чата.
+Показывает только одно число, количество токенов, потраченных в контексте чата.
 
 ### Особенности
 
-- Маленькая и полупрозрачная скруглённая капсула в стиле глассморфизм — не отвлекает, легко перемещается.
-- Минимализм — никаких лишних элементов, только счётчик.
+- Маленькая и полупрозрачная скруглённая капсула в стиле глассморфизм, не отвлекает, легко перемещается.
+- Минимализм, никаких лишних элементов, только счётчик.
 - Перетаскивание в любом разделе SillyTavern.
 
 ### Установка
