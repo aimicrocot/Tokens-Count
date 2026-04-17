@@ -97,23 +97,29 @@
         if (!tokenValueSpan) return;
 
         try {
-            // Вариант 1: Прямое чтение из глобальной переменной ST.
-            // Именно это число отображается в строке "Total Tokens in Prompt" в меню.
-            // Это надежнее, так как работает даже при закрытом окне Itemization.
-            const totalTokens = window.token_count || 0;
+            const context = SillyTavern.getContext();
+            
+            // 1. Самый надежный источник: token_count внутри контекста.
+            // Это то самое число "Total Tokens in Prompt", которое ты видишь в Itemization.
+            let total = context.token_count || 0;
 
-            if (totalTokens > 0) {
-                tokenValueSpan.textContent = totalTokens.toLocaleString();
-                return;
+            // 2. Резервный вариант: если в контексте пусто, пробуем глобальную переменную
+            if (total === 0 && typeof window.token_count !== 'undefined') {
+                total = window.token_count;
             }
 
-            // Вариант 2: Поиск в DOM (если окно открыто и мы хотим считать именно оттуда)
-            const label = $('.flex1:contains("Total Tokens in Prompt:")');
-            if (label.length > 0) {
-                const valueText = label.next('.flex1').text().trim();
-                const count = parseInt(valueText.replace(/[^0-9]/g, ''), 10) || 0;
-                tokenValueSpan.textContent = count.toLocaleString();
+            // 3. Резервный вариант: если окно Itemization открыто (как на скрине), 
+            // берем значение прямо из него.
+            if (total === 0) {
+                const label = $('.flex1:contains("Total Tokens in Prompt:")');
+                if (label.length > 0) {
+                    const valueText = label.next('.flex1').text().trim();
+                    total = parseInt(valueText.replace(/[^0-9]/g, ''), 10) || 0;
+                }
             }
+
+            // Выводим результат
+            tokenValueSpan.textContent = total.toLocaleString();
 
         } catch (err) {
             console.warn('Token Tracker: ошибка при получении данных', err);
