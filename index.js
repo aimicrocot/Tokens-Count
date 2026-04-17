@@ -96,20 +96,55 @@
     function updateTokenCount() {
         if (!tokenValueSpan) return;
 
-        // 1. Прямое обращение к глобальной переменной, которую использует окно Itemization
-        const total = window.token_count;
+        try {
+            // 1. Пытаемся взять чистую цифру из глобальной переменной ST
+            let total = window.token_count;
 
-        if (total !== undefined && total !== null) {
-            tokenValueSpan.textContent = Number(total).toLocaleString();
-        } else {
-            // 2. Резервный поиск, если переменная еще не определена (парсим основной счетчик ST)
-            const stCounter = document.getElementById('token_counter');
-            if (stCounter) {
-                tokenValueSpan.textContent = stCounter.textContent.trim();
+            // 2. Если в переменной пусто, берем из основного счетчика в углу экрана
+            if (!total || total === 0) {
+                const stCounter = document.getElementById('token_counter');
+                if (stCounter) {
+                    const text = stCounter.textContent.trim();
+                    // Извлекаем только цифры (чтобы фраза "Подсчитать токены" превратилась в 0)
+                    total = parseInt(text.replace(/\D/g, ''), 10);
+                }
             }
+
+            // 3. Если всё еще 0, ищем в окне статистики (независимо от языка)
+            if (!total || total === 0) {
+                // Ищем строку, которая идет после иконки или заголовка и содержит число
+                const lastFlex = $('.flex1').last(); 
+                if (lastFlex.length > 0) {
+                    total = parseInt(lastFlex.text().replace(/\D/g, ''), 10);
+                }
+            }
+
+            // Выводим только если это число, иначе ставим 0
+            const finalCount = (isNaN(total) || total === null) ? 0 : total;
+            tokenValueSpan.textContent = finalCount.toLocaleString();
+
+        } catch (err) {
+            console.error('Token Tracker Error:', err);
         }
     }
 
+    // Правильная инициализация (подписка на события ST)
+    jQuery(function() {
+        createPanel();
+
+        // Обновлять, когда сама SillyTavern закончила расчет
+        $(document).on('token_count_updated', updateTokenCount);
+        
+        // Обновлять при переключении чатов или персонажей
+        $(document).on('v_char_selected', updateTokenCount);
+
+        // Резервный цикл обновления (раз в 2 секунды)
+        setInterval(updateTokenCount, 2000);
+
+        // Первый запуск
+        updateTokenCount();
+    });
+    
     // Инициализация
     jQuery(function() {
         createPanel();
