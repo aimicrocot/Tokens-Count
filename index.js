@@ -96,36 +96,39 @@
     function updateTokenCount() {
         if (!tokenValueSpan) return;
 
-        try {
-            const context = SillyTavern.getContext();
-            
-            // 1. Самый надежный источник: token_count внутри контекста.
-            // Это то самое число "Total Tokens in Prompt", которое ты видишь в Itemization.
-            let total = context.token_count || 0;
+        // 1. Прямое обращение к глобальной переменной, которую использует окно Itemization
+        const total = window.token_count;
 
-            // 2. Резервный вариант: если в контексте пусто, пробуем глобальную переменную
-            if (total === 0 && typeof window.token_count !== 'undefined') {
-                total = window.token_count;
+        if (total !== undefined && total !== null) {
+            tokenValueSpan.textContent = Number(total).toLocaleString();
+        } else {
+            // 2. Резервный поиск, если переменная еще не определена (парсим основной счетчик ST)
+            const stCounter = document.getElementById('token_counter');
+            if (stCounter) {
+                tokenValueSpan.textContent = stCounter.textContent.trim();
             }
-
-            // 3. Резервный вариант: если окно Itemization открыто (как на скрине), 
-            // берем значение прямо из него.
-            if (total === 0) {
-                const label = $('.flex1:contains("Total Tokens in Prompt:")');
-                if (label.length > 0) {
-                    const valueText = label.next('.flex1').text().trim();
-                    total = parseInt(valueText.replace(/[^0-9]/g, ''), 10) || 0;
-                }
-            }
-
-            // Выводим результат
-            tokenValueSpan.textContent = total.toLocaleString();
-
-        } catch (err) {
-            console.warn('Token Tracker: ошибка при получении данных', err);
         }
     }
 
+    // Инициализация
+    jQuery(function() {
+        createPanel();
+
+        // Вместо того чтобы просто ждать 3 секунды, мы подписываемся на события ST
+        // Это заставит капсулу обновляться МГНОВЕННО, как только ST пересчитает токены
+        $(document).on('token_count_updated', function() {
+            updateTokenCount();
+        });
+
+        // Также обновляем при вводе (на всякий случай)
+        $(document).on('input', '#send_textarea', function() {
+            updateTokenCount();
+        });
+
+        // Первичный запуск
+        setTimeout(updateTokenCount, 500);
+    });
+    
     // Инициализация после загрузки страницы и готовности ST
     jQuery(async function() {
         createPanel();
