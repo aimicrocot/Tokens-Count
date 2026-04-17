@@ -93,40 +93,68 @@
     }
 
     // Подсчёт токенов в текущем чате
-    function updateTokenCount() {
+    async function updateTokenCount() {
         if (!tokenValueSpan) return;
 
         try {
-            // 1. Пытаемся взять чистую цифру из глобальной переменной ST
-            let total = window.token_count;
+            const context = SillyTavern.getContext();
+            let total = 0;
 
-            // 2. Если в переменной пусто, берем из основного счетчика в углу экрана
-            if (!total || total === 0) {
+            // 1. Прямое получение итемизации (самый точный способ в ST)
+            // Это исключает попадание таймстампов вместо цифр
+            const itemization = await context.getPromptItemization();
+            
+            if (itemization && Array.isArray(itemization)) {
+                // Считаем сумму токенов всех компонентов
+                total = itemization.reduce((sum, item) => {
+                    const count = parseInt(item.tokens);
+                    return sum + (isNaN(count) ? 0 : count);
+                }, 0);
+            }
+
+            // 2. Если итемизация не сработала, пробуем достать из спец. переменной
+            // Но проверяем, что это адекватное число (не таймстамп)
+            if (total <= 0) {
+                const rawCount = window.token_count;
+                if (typeof rawCount === 'number' && rawCount < 100000000) {
+                    total = rawCount;
+                }
+            }
+
+            // 3. Последний шанс: парсим текст из статус-бара, если он там есть
+            if (total <= 0) {
                 const stCounter = document.getElementById('token_counter');
                 if (stCounter) {
-                    const text = stCounter.textContent.trim();
-                    // Извлекаем только цифры (чтобы фраза "Подсчитать токены" превратилась в 0)
-                    total = parseInt(text.replace(/\D/g, ''), 10);
+                    const match = stCounter.textContent.match(/\d+/);
+                    if (match) total = parseInt(match[0]);
                 }
             }
 
-            // 3. Если всё еще 0, ищем в окне статистики (независимо от языка)
-            if (!total || total === 0) {
-                // Ищем строку, которая идет после иконки или заголовка и содержит число
-                const lastFlex = $('.flex1').last(); 
-                if (lastFlex.length > 0) {
-                    total = parseInt(lastFlex.text().replace(/\D/g, ''), 10);
-                }
+            // Вывод результата (если всё равно 0, значит промпт еще не готов)
+            if (total > 0) {
+                tokenValueSpan.textContent = total.toLocaleString();
             }
-
-            // Выводим только если это число, иначе ставим 0
-            const finalCount = (isNaN(total) || total === null) ? 0 : total;
-            tokenValueSpan.textContent = finalCount.toLocaleString();
 
         } catch (err) {
-            console.error('Token Tracker Error:', err);
+            console.warn('Token Tracker: ошибка при расчете', err);
         }
     }
+
+    // Инициализация
+    jQuery(function() {
+        createPanel();
+
+        // Слушаем событие обновления токенов от самой SillyTavern
+        $(document).on('token_count_updated', function() {
+            updateTokenCount();
+        });
+
+        // Запускаем проверку раз в 3 секунды для подстраховки
+        setInterval(updateTokenCount, 3000);
+
+        // Первый запуск с небольшой задержкой
+        setTimeout(updateTokenCount, 1000);
+    });
 
     // Правильная инициализация (подписка на события ST)
     jQuery(function() {
