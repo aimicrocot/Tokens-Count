@@ -93,105 +93,27 @@
     }
 
     // Подсчёт токенов в текущем чате
-    async function updateTokenCount() {
+    function updateTokenCount() {
         if (!tokenValueSpan) return;
 
         try {
             const context = SillyTavern.getContext();
-            let total = 0;
-
-            // 1. Прямое получение итемизации (самый точный способ в ST)
-            // Это исключает попадание таймстампов вместо цифр
-            const itemization = await context.getPromptItemization();
-            
-            if (itemization && Array.isArray(itemization)) {
-                // Считаем сумму токенов всех компонентов
-                total = itemization.reduce((sum, item) => {
-                    const count = parseInt(item.tokens);
-                    return sum + (isNaN(count) ? 0 : count);
-                }, 0);
+            if (!context || !context.chat) {
+                tokenValueSpan.textContent = '0';
+                return;
             }
 
-            // 2. Если итемизация не сработала, пробуем достать из спец. переменной
-            // Но проверяем, что это адекватное число (не таймстамп)
-            if (total <= 0) {
-                const rawCount = window.token_count;
-                if (typeof rawCount === 'number' && rawCount < 100000000) {
-                    total = rawCount;
-                }
-            }
+            const messages = context.chat.filter(msg => !msg.extra?.hidden && !msg.is_system);
+            const fullText = messages.map(msg => msg.mes).join('\n');
+            const tokenCount = context.getTokenCount(fullText) || 0;
 
-            // 3. Последний шанс: парсим текст из статус-бара, если он там есть
-            if (total <= 0) {
-                const stCounter = document.getElementById('token_counter');
-                if (stCounter) {
-                    const match = stCounter.textContent.match(/\d+/);
-                    if (match) total = parseInt(match[0]);
-                }
-            }
-
-            // Вывод результата (если всё равно 0, значит промпт еще не готов)
-            if (total > 0) {
-                tokenValueSpan.textContent = total.toLocaleString();
-            }
-
+            tokenValueSpan.textContent = tokenCount.toLocaleString();
         } catch (err) {
-            console.warn('Token Tracker: ошибка при расчете', err);
+            console.warn('Token Tracker: не удалось подсчитать токены', err);
+            tokenValueSpan.textContent = '?';
         }
     }
 
-    // Инициализация
-    jQuery(function() {
-        createPanel();
-
-        // Слушаем событие обновления токенов от самой SillyTavern
-        $(document).on('token_count_updated', function() {
-            updateTokenCount();
-        });
-
-        // Запускаем проверку раз в 3 секунды для подстраховки
-        setInterval(updateTokenCount, 3000);
-
-        // Первый запуск с небольшой задержкой
-        setTimeout(updateTokenCount, 1000);
-    });
-
-    // Правильная инициализация (подписка на события ST)
-    jQuery(function() {
-        createPanel();
-
-        // Обновлять, когда сама SillyTavern закончила расчет
-        $(document).on('token_count_updated', updateTokenCount);
-        
-        // Обновлять при переключении чатов или персонажей
-        $(document).on('v_char_selected', updateTokenCount);
-
-        // Резервный цикл обновления (раз в 2 секунды)
-        setInterval(updateTokenCount, 2000);
-
-        // Первый запуск
-        updateTokenCount();
-    });
-    
-    // Инициализация
-    jQuery(function() {
-        createPanel();
-
-        // Вместо того чтобы просто ждать 3 секунды, мы подписываемся на события ST
-        // Это заставит капсулу обновляться МГНОВЕННО, как только ST пересчитает токены
-        $(document).on('token_count_updated', function() {
-            updateTokenCount();
-        });
-
-        // Также обновляем при вводе (на всякий случай)
-        $(document).on('input', '#send_textarea', function() {
-            updateTokenCount();
-        });
-
-        // Первичный запуск
-        setTimeout(updateTokenCount, 500);
-    });
-    
     // Инициализация после загрузки страницы и готовности ST
     jQuery(async function() {
         createPanel();
