@@ -97,20 +97,26 @@
         if (!tokenValueSpan) return;
 
         try {
-            const context = SillyTavern.getContext();
-            if (!context || !context.chat) {
-                tokenValueSpan.textContent = '0';
+            // Вариант 1: Прямое чтение из глобальной переменной ST.
+            // Именно это число отображается в строке "Total Tokens in Prompt" в меню.
+            // Это надежнее, так как работает даже при закрытом окне Itemization.
+            const totalTokens = window.token_count || 0;
+
+            if (totalTokens > 0) {
+                tokenValueSpan.textContent = totalTokens.toLocaleString();
                 return;
             }
 
-            const messages = context.chat.filter(msg => !msg.extra?.hidden && !msg.is_system);
-            const fullText = messages.map(msg => msg.mes).join('\n');
-            const tokenCount = context.getTokenCount(fullText) || 0;
+            // Вариант 2: Поиск в DOM (если окно открыто и мы хотим считать именно оттуда)
+            const label = $('.flex1:contains("Total Tokens in Prompt:")');
+            if (label.length > 0) {
+                const valueText = label.next('.flex1').text().trim();
+                const count = parseInt(valueText.replace(/[^0-9]/g, ''), 10) || 0;
+                tokenValueSpan.textContent = count.toLocaleString();
+            }
 
-            tokenValueSpan.textContent = tokenCount.toLocaleString();
         } catch (err) {
-            console.warn('Token Tracker: не удалось подсчитать токены', err);
-            tokenValueSpan.textContent = '?';
+            console.warn('Token Tracker: ошибка при получении данных', err);
         }
     }
 
