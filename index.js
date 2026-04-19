@@ -94,22 +94,33 @@ async function updateTokenCount() {
     if (!tokenValueSpan) return;
 
     try {
-        // Динамически подгружаем модуль. Это обходит блокировку обычного import.
-        const { itemizedParams } = await import('../../../itemized-prompts.js');
+        // 1. Пытаемся импортировать через абсолютный путь от корня /scripts/
+        const modulePath = '/scripts/itemized-prompts.js';
+        const module = await import(modulePath);
         
-        // Вызываем функцию
-        const params = await itemizedParams();
+        // 2. Вызываем функцию itemizedParams
+        // В некоторых версиях ST она возвращает промис, поэтому используем await
+        const params = await module.itemizedParams();
         
-        if (params && params.totalTokensInPrompt) {
-            tokenValueSpan.textContent = Number(params.totalTokensInPrompt).toLocaleString();
+        if (params && typeof params.totalTokensInPrompt !== 'undefined') {
+            const count = parseInt(params.totalTokensInPrompt);
+            tokenValueSpan.textContent = isNaN(count) ? '0' : count.toLocaleString();
         } else {
-            // Если функция отработала, но данных нет
-            tokenValueSpan.textContent = '0 (пусто)';
+            tokenValueSpan.textContent = '...'; // Данные еще готовятся
         }
     } catch (err) {
-        console.error('Token Tracker: Ошибка импорта или выполнения', err);
-        // Выводим ошибку прямо на плашку, чтобы сразу её увидеть
-        tokenValueSpan.textContent = 'Ошибка'; 
+        console.error('Token Tracker Detail:', err);
+        
+        // РЕЗЕРВНЫЙ ПЛАН: Если импорт не удался, пробуем вытащить число из скрытого счетчика ST
+        const stCounter = document.getElementById('token_counter');
+        if (stCounter) {
+            const rawText = stCounter.textContent.trim();
+            // Забираем только цифры
+            const onlyDigits = rawText.replace(/\D/g, '');
+            tokenValueSpan.textContent = onlyDigits || '0';
+        } else {
+            tokenValueSpan.textContent = 'Err';
+        }
     }
 }
 
