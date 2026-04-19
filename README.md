@@ -5,6 +5,7 @@
 
 ### About
 
+Updated! Now more accurate. It takes the number of tokens from the Prompt Itemization section, specifically from Total Tokens in Prompt.
 The most minimalistic token counter for SillyTavern (from those I saw). Shows only one number, the number of tokens consumed in the chat context.
 
 ### Features
@@ -30,7 +31,8 @@ https://github.com/SunKatz05/Chat-Tracker-ST</details>
 
 ### О расширении
 
-Самый минималистичный счётчик токенов (из встреченных мной) для SillyTavern. Показывает только одно число, количество токенов, потраченных в контексте чата.
+Обновлено! Теперь работает точнее. Берёт число токенов из раздела Prompt Itemization, а именно из Total Tokens in Prompt.
+Самый минималистичный счётчик токенов (из встреченных мной) для SillyTavern. Показывает только одно число, количество токенов, потраченных вами.
 
 ### Особенности
 
@@ -48,5 +50,5 @@ https://github.com/SunKatz05/Chat-Tracker-ST</details>
 
 ### Кредиты
 
-Расширение базируется на Chat-Tracker-ST от SunKatz05: 
+Расширение изначально базировалось на Chat-Tracker-ST от SunKatz05: 
 https://github.com/SunKatz05/Chat-Tracker-ST
