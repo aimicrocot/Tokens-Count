@@ -90,26 +90,22 @@
     function calcTotalTokens(prompts) {
         if (!prompts || !prompts.length) return null;
 
-        const last = prompts[prompts.length - 1];
-        if (!last) return null;
+        // Берём элемент с максимальным mesId — последнее сообщение текущего чата
+        const last = prompts.reduce((a, b) => (a.mesId > b.mesId ? a : b), prompts[0]);
+        if (!last || last.main_api !== 'openai') return null;
 
-        // OAI / Chat Completion
-        if (last.main_api === 'openai') {
-            const total =
-                (last.oaiStartTokens || 0) +
-                (last.oaiPromptTokens || 0) +
-                (last.oaiMainTokens || 0) +
-                (last.oaiNsfwTokens || 0) +
-                (last.oaiBiasTokens || 0) +
-                (last.oaiImpersonateTokens || 0) +
-                (last.oaiJailbreakTokens || 0) +
-                (last.oaiNudgeTokens || 0) +
-                (last.oaiConversationTokens || 0);
-            return total > 0 ? total : null;
-        }
+        const total =
+            (last.oaiStartTokens || 0) +
+            (last.oaiPromptTokens || 0) +
+            (last.oaiMainTokens || 0) +
+            (last.oaiNsfwTokens || 0) +
+            (last.oaiBiasTokens || 0) +
+            (last.oaiImpersonateTokens || 0) +
+            (last.oaiJailbreakTokens || 0) +
+            (last.oaiNudgeTokens || 0) +
+            (last.oaiConversationTokens || 0);
 
-        // Text Completion
-        return null;
+        return total > 0 ? total : null;
     }
 
     async function updateTokenCount() {
@@ -120,6 +116,8 @@
             const total = calcTotalTokens(prompts);
             if (total !== null) {
                 tokenValueSpan.textContent = total.toLocaleString();
+            } else {
+                tokenValueSpan.textContent = '—';
             }
         } catch (err) {
             console.warn('Token Tracker: ошибка при чтении токенов', err);
@@ -130,28 +128,42 @@
         createPanel();
 
         try {
-            // Импортируем модуль напрямую
             itemizedPromptsModule = await import('/scripts/itemized-prompts.js');
         } catch (err) {
             console.warn('Token Tracker: не удалось импортировать itemized-prompts.js', err);
+            return;
         }
 
-        const waitForST = setInterval(() => {
+        const waitForST = setInterval(async () => {
             if (typeof SillyTavern !== 'undefined' && SillyTavern.getContext) {
                 clearInterval(waitForST);
 
                 const { eventSource, event_types } = SillyTavern.getContext();
 
                 if (eventSource && event_types) {
+                    // После получения сообщения от AI
                     eventSource.on(event_types.MESSAGE_RECEIVED, () => {
                         setTimeout(updateTokenCount, 1000);
                     });
+
+                    // После свайпа
                     eventSource.on(event_types.MESSAGE_SWIPED, () => {
                         setTimeout(updateTokenCount, 1000);
                     });
+
+                    // После смены чата — ждём пока ST загрузит itemizedPrompts для нового чата
+                    eventSource.on(event_types.CHAT_LOADED, () => {
+                        setTimeout(updateTokenCount, 1500);
+                    });
+
+                    eventSource.on(event_types.CHAT_CHANGED, () => {
+                        tokenValueSpan.textContent = '—';
+                        setTimeout(updateTokenCount, 2000);
+                    });
                 }
 
-                updateTokenCount();
+                // Первичное обновление — ждём загрузки данных
+                setTimeout(updateTokenCount, 1500);
             }
         }, 500);
     });
