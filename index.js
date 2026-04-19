@@ -87,23 +87,37 @@
         if (saved.left) el.style.left = saved.left;
     }
 
-    function calcTotalTokens(prompts) {
+    async function calcTotalTokens(prompts) {
         if (!prompts || !prompts.length) return null;
 
-        // Берём элемент с максимальным mesId — последнее сообщение текущего чата
         const last = prompts.reduce((a, b) => (a.mesId > b.mesId ? a : b), prompts[0]);
         if (!last || last.main_api !== 'openai') return null;
 
+        const context = SillyTavern.getContext();
+        const getTokenCountAsync = context.getTokenCountAsync;
+
+        const beforeScenarioAnchorTokens = await getTokenCountAsync(last.beforeScenarioAnchor || '');
+        const afterScenarioAnchorTokens = await getTokenCountAsync(last.afterScenarioAnchor || '');
+        const worldInfoStringTokens = await getTokenCountAsync(last.worldInfoString || '');
+        const examplesStringTokens = last.oaiExamplesTokens || 0;
+
+        const oaiPromptTokens = (last.oaiPromptTokens || 0)
+            - (afterScenarioAnchorTokens + beforeScenarioAnchorTokens)
+            + examplesStringTokens;
+
         const total =
             (last.oaiStartTokens || 0) +
-            (last.oaiPromptTokens || 0) +
+            oaiPromptTokens +
             (last.oaiMainTokens || 0) +
             (last.oaiNsfwTokens || 0) +
             (last.oaiBiasTokens || 0) +
             (last.oaiImpersonateTokens || 0) +
             (last.oaiJailbreakTokens || 0) +
             (last.oaiNudgeTokens || 0) +
-            (last.oaiConversationTokens || 0);
+            (last.oaiConversationTokens || 0) +
+            worldInfoStringTokens +
+            beforeScenarioAnchorTokens +
+            afterScenarioAnchorTokens;
 
         return total > 0 ? total : null;
     }
@@ -113,7 +127,7 @@
 
         try {
             const prompts = itemizedPromptsModule.itemizedPrompts;
-            const total = calcTotalTokens(prompts);
+            const total = await calcTotalTokens(prompts);
             if (total !== null) {
                 tokenValueSpan.textContent = total.toLocaleString();
             } else {
@@ -141,17 +155,14 @@
                 const { eventSource, event_types } = SillyTavern.getContext();
 
                 if (eventSource && event_types) {
-                    // После получения сообщения от AI
                     eventSource.on(event_types.MESSAGE_RECEIVED, () => {
                         setTimeout(updateTokenCount, 1000);
                     });
 
-                    // После свайпа
                     eventSource.on(event_types.MESSAGE_SWIPED, () => {
                         setTimeout(updateTokenCount, 1000);
                     });
 
-                    // После смены чата — ждём пока ST загрузит itemizedPrompts для нового чата
                     eventSource.on(event_types.CHAT_LOADED, () => {
                         setTimeout(updateTokenCount, 1500);
                     });
@@ -162,7 +173,6 @@
                     });
                 }
 
-                // Первичное обновление — ждём загрузки данных
                 setTimeout(updateTokenCount, 1500);
             }
         }, 500);
