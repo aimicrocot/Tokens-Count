@@ -10,9 +10,10 @@ The most minimalistic token counter for SillyTavern (from those I saw). Shows on
 
 ### Features
 
-- A small semi-transparent rounded capsule in a glassmorphism style, unobtrusive and easy to move around.
-- Minimalism, no extra elements, just the counter.
-- Draggable in any section of SillyTavern.
+- A small semi-transparent rounded capsule in a glassmorphism style, unobtrusive and easy to move around
+- Minimalism, no extra elements, just the counter
+- Draggable in any section of SillyTavern
+- If a dash appears in the capsule, check the bot's most recent message to ensure the Prompt Itemization button is present; when it is present, the number of tokens spent is transmitted starting from the bot’s second message in the chat
 
 ### Installation
 
@@ -36,9 +37,10 @@ https://github.com/SunKatz05/Chat-Tracker-ST</details>
 
 ### Особенности
 
-- Маленькая и полупрозрачная скруглённая капсула в стиле глассморфизм, не отвлекает, легко перемещается.
-- Минимализм, никаких прочих элементов, только потраченные токены.
-- Перетаскивание в любом разделе SillyTavern.
+- Маленькая и полупрозрачная скруглённая капсула в стиле глассморфизм, не отвлекает, легко перемещается
+- Минимализм, никаких прочих элементов, только потраченные токены
+- Перетаскивание в любом разделе SillyTavern
+- Если у вас отображается прочерк в капсуле, проверьте последнее сообщение от бота, что кнопка Prompt Itemization есть. Когда она есть, то передаётся число потраченных токенов начиная со 2 сообщения бота в чате
 
 ### Установка
 
