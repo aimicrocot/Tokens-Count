@@ -4,8 +4,8 @@
     let startX, startY, initialLeft, initialTop;
     let panelElement = null;
     let tokenValueSpan = null;
+    let itemizedPromptsModule = null;
 
-    // Создание плашки
     function createPanel() {
         if (document.getElementById('token-tracker-panel')) return;
 
@@ -21,7 +21,6 @@
         loadPosition(panelElement);
     }
 
-    // Перетаскивание (поддержка мыши и сенсора)
     function setupDraggable(el) {
         const onStart = (e) => {
             e.stopPropagation();
@@ -75,7 +74,6 @@
         el.addEventListener('touchstart', onStart, { passive: false });
     }
 
-    // Сохранение позиции
     function savePosition(el) {
         localStorage.setItem('tokenTracker_pos', JSON.stringify({
             top: el.style.top,
@@ -83,106 +81,76 @@
         }));
     }
 
-    // Загрузка позиции
     function loadPosition(el) {
         const saved = JSON.parse(localStorage.getItem('tokenTracker_pos') || '{}');
         if (saved.top) el.style.top = saved.top;
         if (saved.left) el.style.left = saved.left;
     }
 
-    // Чтение токенов из itemizedPrompts (Prompt Itemization → Total Tokens in Prompt)
-    function readTokensFromItemizedPrompts() {
+    function calcTotalTokens(prompts) {
+        if (!prompts || !prompts.length) return null;
+
+        const last = prompts[prompts.length - 1];
+        if (!last) return null;
+
+        // OAI / Chat Completion
+        if (last.main_api === 'openai') {
+            const total =
+                (last.oaiStartTokens || 0) +
+                (last.oaiPromptTokens || 0) +
+                (last.oaiMainTokens || 0) +
+                (last.oaiNsfwTokens || 0) +
+                (last.oaiBiasTokens || 0) +
+                (last.oaiImpersonateTokens || 0) +
+                (last.oaiJailbreakTokens || 0) +
+                (last.oaiNudgeTokens || 0) +
+                (last.oaiConversationTokens || 0);
+            return total > 0 ? total : null;
+        }
+
+        // Text Completion
+        return null;
+    }
+
+    async function updateTokenCount() {
+        if (!tokenValueSpan || !itemizedPromptsModule) return;
+
         try {
-            // itemizedPrompts — глобальный массив, заполняется после каждой генерации
-            if (typeof itemizedPrompts === 'undefined' || !itemizedPrompts.length) {
-                return null;
+            const prompts = itemizedPromptsModule.itemizedPrompts;
+            const total = calcTotalTokens(prompts);
+            if (total !== null) {
+                tokenValueSpan.textContent = total.toLocaleString();
             }
-
-            const last = itemizedPrompts[itemizedPrompts.length - 1];
-            if (!last) return null;
-
-            // Для OAI/Claude (Chat Completion): сумма всех oai*Tokens полей
-            // Это именно то, что отображается как "Total Tokens in Prompt"
-            const oaiFields = [
-                'oaiStartTokens',
-                'oaiPromptTokens',
-                'oaiBiasTokens',
-                'oaiNudgeTokens',
-                'oaiJailbreakTokens',
-                'oaiSystemTokens',
-                'oaiInjectedTokens',
-            ];
-
-            // Проверяем, есть ли OAI-поля
-            const hasOaiFields = oaiFields.some(f => typeof last[f] === 'number');
-
-            if (hasOaiFields) {
-                const total = oaiFields.reduce((sum, f) => sum + (last[f] || 0), 0);
-                return total > 0 ? total : null;
-            }
-
-            // Для Text Completion (KoboldAI, TextGen и др.)
-            const textFields = [
-                'charDescriptionTokens',
-                'charPersonalityTokens',
-                'scenarioTextTokens',
-                'userPersonaStringTokens',
-                'worldInfoStringTokens',
-                'allAnchorsTokens',
-                'injectedPromptTokens',
-                'chatHistoryTokens',
-            ];
-
-            const hasTextFields = textFields.some(f => typeof last[f] === 'number');
-
-            if (hasTextFields) {
-                const total = textFields.reduce((sum, f) => sum + (last[f] || 0), 0);
-                return total > 0 ? total : null;
-            }
-
-            return null;
         } catch (err) {
-            console.warn('Token Tracker: ошибка при чтении itemizedPrompts', err);
-            return null;
+            console.warn('Token Tracker: ошибка при чтении токенов', err);
         }
     }
 
-    function updateTokenCount() {
-        if (!tokenValueSpan) return;
-
-        const count = readTokensFromItemizedPrompts();
-        if (count !== null) {
-            tokenValueSpan.textContent = count.toLocaleString();
-        }
-        // Если null — не трогаем: оставляем прежнее значение (или '—' при старте)
-    }
-
-    // Инициализация
     jQuery(async function() {
         createPanel();
 
-        // Ждём готовности ST и подписываемся на события генерации
+        try {
+            // Импортируем модуль напрямую
+            itemizedPromptsModule = await import('/scripts/itemized-prompts.js');
+        } catch (err) {
+            console.warn('Token Tracker: не удалось импортировать itemized-prompts.js', err);
+        }
+
         const waitForST = setInterval(() => {
             if (typeof SillyTavern !== 'undefined' && SillyTavern.getContext) {
                 clearInterval(waitForST);
 
-                const context = SillyTavern.getContext();
-                const { eventSource, event_types } = context;
+                const { eventSource, event_types } = SillyTavern.getContext();
 
                 if (eventSource && event_types) {
-                    // Обновляем после каждого полученного сообщения от AI
                     eventSource.on(event_types.MESSAGE_RECEIVED, () => {
-                        // Небольшая задержка: ST заполняет itemizedPrompts асинхронно
-                        setTimeout(updateTokenCount, 500);
+                        setTimeout(updateTokenCount, 1000);
                     });
-
-                    // Также обновляем после свайпа
                     eventSource.on(event_types.MESSAGE_SWIPED, () => {
-                        setTimeout(updateTokenCount, 500);
+                        setTimeout(updateTokenCount, 1000);
                     });
                 }
 
-                // Первичное обновление при наличии данных
                 updateTokenCount();
             }
         }, 500);
