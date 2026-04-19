@@ -1,140 +1,191 @@
-let isDragging = false;
-let startX, startY, initialLeft, initialTop;
-let panelElement = null;
-let tokenValueSpan = null;
+(function() {
 
-// Создание плашки
-function createPanel() {
-    if (document.getElementById('token-tracker-panel')) return;
+    let isDragging = false;
+    let startX, startY, initialLeft, initialTop;
+    let panelElement = null;
+    let tokenValueSpan = null;
 
-    panelElement = document.createElement('div');
-    panelElement.id = 'token-tracker-panel';
-    panelElement.className = 'token-tracker-panel';
-    panelElement.innerHTML = `<span id="token-count">0</span>`;
-    document.body.appendChild(panelElement);
+    // Создание плашки
+    function createPanel() {
+        if (document.getElementById('token-tracker-panel')) return;
 
-    tokenValueSpan = document.getElementById('token-count');
+        panelElement = document.createElement('div');
+        panelElement.id = 'token-tracker-panel';
+        panelElement.className = 'token-tracker-panel';
+        panelElement.innerHTML = `<span id="token-count">—</span>`;
+        document.body.appendChild(panelElement);
 
-    setupDraggable(panelElement);
-    loadPosition(panelElement);
-}
+        tokenValueSpan = document.getElementById('token-count');
 
-// Перетаскивание (поддержка мыши и сенсора)
-function setupDraggable(el) {
-    const onStart = (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        isDragging = true;
-        el.classList.add('dragging');
+        setupDraggable(panelElement);
+        loadPosition(panelElement);
+    }
 
-        const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-        const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
-        startX = clientX;
-        startY = clientY;
+    // Перетаскивание (поддержка мыши и сенсора)
+    function setupDraggable(el) {
+        const onStart = (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            isDragging = true;
+            el.classList.add('dragging');
 
-        const rect = el.getBoundingClientRect();
-        initialLeft = rect.left;
-        initialTop = rect.top;
+            const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+            startX = clientX;
+            startY = clientY;
 
-        el.style.right = 'auto';
-        el.style.bottom = 'auto';
+            const rect = el.getBoundingClientRect();
+            initialLeft = rect.left;
+            initialTop = rect.top;
 
-        document.addEventListener('mousemove', onMove);
-        document.addEventListener('mouseup', onEnd);
-        document.addEventListener('touchmove', onMove, { passive: false });
-        document.addEventListener('touchend', onEnd);
-    };
+            el.style.right = 'auto';
+            el.style.bottom = 'auto';
 
-    const onMove = (e) => {
-        if (!isDragging) return;
-        e.preventDefault();
-        e.stopPropagation();
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onEnd);
+            document.addEventListener('touchmove', onMove, { passive: false });
+            document.addEventListener('touchend', onEnd);
+        };
 
-        const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
-        const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+        const onMove = (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            e.stopPropagation();
 
-        el.style.left = (initialLeft + (clientX - startX)) + 'px';
-        el.style.top = (initialTop + (clientY - startY)) + 'px';
-    };
+            const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
 
-    const onEnd = (e) => {
-        if (!isDragging) return;
-        isDragging = false;
-        panelElement.classList.remove('dragging');
-        savePosition(panelElement);
+            el.style.left = (initialLeft + (clientX - startX)) + 'px';
+            el.style.top = (initialTop + (clientY - startY)) + 'px';
+        };
 
-        document.removeEventListener('mousemove', onMove);
-        document.removeEventListener('mouseup', onEnd);
-        document.removeEventListener('touchmove', onMove);
-        document.removeEventListener('touchend', onEnd);
-    };
+        const onEnd = () => {
+            if (!isDragging) return;
+            isDragging = false;
+            panelElement.classList.remove('dragging');
+            savePosition(panelElement);
 
-    el.addEventListener('mousedown', onStart);
-    el.addEventListener('touchstart', onStart, { passive: false });
-}
+            document.removeEventListener('mousemove', onMove);
+            document.removeEventListener('mouseup', onEnd);
+            document.removeEventListener('touchmove', onMove);
+            document.removeEventListener('touchend', onEnd);
+        };
 
-// Сохранение позиции
-function savePosition(el) {
-    localStorage.setItem('tokenTracker_pos', JSON.stringify({
-        top: el.style.top,
-        left: el.style.left
-    }));
-}
+        el.addEventListener('mousedown', onStart);
+        el.addEventListener('touchstart', onStart, { passive: false });
+    }
 
-// Загрузка позиции
-function loadPosition(el) {
-    const saved = JSON.parse(localStorage.getItem('tokenTracker_pos') || '{}');
-    if (saved.top) el.style.top = saved.top;
-    if (saved.left) el.style.left = saved.left;
-}
+    // Сохранение позиции
+    function savePosition(el) {
+        localStorage.setItem('tokenTracker_pos', JSON.stringify({
+            top: el.style.top,
+            left: el.style.left
+        }));
+    }
 
-// Подсчёт токенов напрямую из itemizedParams
-// Подсчёт токенов с помощью динамического импорта
-async function updateTokenCount() {
-    if (!tokenValueSpan) return;
+    // Загрузка позиции
+    function loadPosition(el) {
+        const saved = JSON.parse(localStorage.getItem('tokenTracker_pos') || '{}');
+        if (saved.top) el.style.top = saved.top;
+        if (saved.left) el.style.left = saved.left;
+    }
 
-    try {
-        // 1. Пытаемся импортировать через абсолютный путь от корня /scripts/
-        const modulePath = '/scripts/itemized-prompts.js';
-        const module = await import(modulePath);
-        
-        // 2. Вызываем функцию itemizedParams
-        // В некоторых версиях ST она возвращает промис, поэтому используем await
-        const params = await module.itemizedParams();
-        
-        if (params && typeof params.totalTokensInPrompt !== 'undefined') {
-            const count = parseInt(params.totalTokensInPrompt);
-            tokenValueSpan.textContent = isNaN(count) ? '0' : count.toLocaleString();
-        } else {
-            tokenValueSpan.textContent = '...'; // Данные еще готовятся
-        }
-    } catch (err) {
-        console.error('Token Tracker Detail:', err);
-        
-        // РЕЗЕРВНЫЙ ПЛАН: Если импорт не удался, пробуем вытащить число из скрытого счетчика ST
-        const stCounter = document.getElementById('token_counter');
-        if (stCounter) {
-            const rawText = stCounter.textContent.trim();
-            // Забираем только цифры
-            const onlyDigits = rawText.replace(/\D/g, '');
-            tokenValueSpan.textContent = onlyDigits || '0';
-        } else {
-            tokenValueSpan.textContent = 'Err';
+    // Чтение токенов из itemizedPrompts (Prompt Itemization → Total Tokens in Prompt)
+    function readTokensFromItemizedPrompts() {
+        try {
+            // itemizedPrompts — глобальный массив, заполняется после каждой генерации
+            if (typeof itemizedPrompts === 'undefined' || !itemizedPrompts.length) {
+                return null;
+            }
+
+            const last = itemizedPrompts[itemizedPrompts.length - 1];
+            if (!last) return null;
+
+            // Для OAI/Claude (Chat Completion): сумма всех oai*Tokens полей
+            // Это именно то, что отображается как "Total Tokens in Prompt"
+            const oaiFields = [
+                'oaiStartTokens',
+                'oaiPromptTokens',
+                'oaiBiasTokens',
+                'oaiNudgeTokens',
+                'oaiJailbreakTokens',
+                'oaiSystemTokens',
+                'oaiInjectedTokens',
+            ];
+
+            // Проверяем, есть ли OAI-поля
+            const hasOaiFields = oaiFields.some(f => typeof last[f] === 'number');
+
+            if (hasOaiFields) {
+                const total = oaiFields.reduce((sum, f) => sum + (last[f] || 0), 0);
+                return total > 0 ? total : null;
+            }
+
+            // Для Text Completion (KoboldAI, TextGen и др.)
+            const textFields = [
+                'charDescriptionTokens',
+                'charPersonalityTokens',
+                'scenarioTextTokens',
+                'userPersonaStringTokens',
+                'worldInfoStringTokens',
+                'allAnchorsTokens',
+                'injectedPromptTokens',
+                'chatHistoryTokens',
+            ];
+
+            const hasTextFields = textFields.some(f => typeof last[f] === 'number');
+
+            if (hasTextFields) {
+                const total = textFields.reduce((sum, f) => sum + (last[f] || 0), 0);
+                return total > 0 ? total : null;
+            }
+
+            return null;
+        } catch (err) {
+            console.warn('Token Tracker: ошибка при чтении itemizedPrompts', err);
+            return null;
         }
     }
-}
 
-// Инициализация
-jQuery(function() {
-    createPanel();
+    function updateTokenCount() {
+        if (!tokenValueSpan) return;
 
-    // Подписываемся на системные события SillyTavern для мгновенного обновления
-    $(document).on('token_count_updated', updateTokenCount);
-    $(document).on('v_char_selected', updateTokenCount);
+        const count = readTokensFromItemizedPrompts();
+        if (count !== null) {
+            tokenValueSpan.textContent = count.toLocaleString();
+        }
+        // Если null — не трогаем: оставляем прежнее значение (или '—' при старте)
+    }
 
-    // Подстраховка (на случай если события не сработают)
-    setInterval(updateTokenCount, 3000);
+    // Инициализация
+    jQuery(async function() {
+        createPanel();
 
-    // Первый запуск
-    setTimeout(updateTokenCount, 1000);
-});
+        // Ждём готовности ST и подписываемся на события генерации
+        const waitForST = setInterval(() => {
+            if (typeof SillyTavern !== 'undefined' && SillyTavern.getContext) {
+                clearInterval(waitForST);
+
+                const context = SillyTavern.getContext();
+                const { eventSource, event_types } = context;
+
+                if (eventSource && event_types) {
+                    // Обновляем после каждого полученного сообщения от AI
+                    eventSource.on(event_types.MESSAGE_RECEIVED, () => {
+                        // Небольшая задержка: ST заполняет itemizedPrompts асинхронно
+                        setTimeout(updateTokenCount, 500);
+                    });
+
+                    // Также обновляем после свайпа
+                    eventSource.on(event_types.MESSAGE_SWIPED, () => {
+                        setTimeout(updateTokenCount, 500);
+                    });
+                }
+
+                // Первичное обновление при наличии данных
+                updateTokenCount();
+            }
+        }, 500);
+    });
+
+})();
