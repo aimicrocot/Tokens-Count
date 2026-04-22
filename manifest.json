@@ -1,7 +1,7 @@
 {
     "name": "st-token-tracker",
     "display_name": "Tokens Count",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Плавающая плашка с количеством токенов в чате.",
     "author": "MicroCot",
     "loading_order": 20,
