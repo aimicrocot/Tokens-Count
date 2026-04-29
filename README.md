@@ -25,7 +25,9 @@ Copy the repository link and add the extension via the SillyTavern extensions me
 
 ### Contacts
 
-My Telegram-channel: [@sillytavern1](https://t.me/sillytavern1)
+- My Telegram-channel: [@sillytavern1](https://t.me/sillytavern1)
+
+- My small personal website featuring my preset, extensions for SillyTavern, and more: [MicroCot](https://aimicrocot.github.io/)
 
 ### Credits
 
@@ -52,7 +54,9 @@ https://github.com/SunKatz05/Chat-Tracker-ST</details>
 
 ### Контакты
 
-Мой Телеграм-канал: [@sillytavern1](https://t.me/sillytavern1)
+- Мой Телеграм-канал: [@sillytavern1](https://t.me/sillytavern1)
+
+- Мой маленький сайт-визитка с моим пресетом, расширениями для SillyTavern и т.д. [MicroCot](https://aimicrocot.github.io/)
 
 ### Кредиты
 
