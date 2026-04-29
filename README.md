@@ -1,5 +1,9 @@
 # Tokens Count
 
+<p align="left">
+  <img src="tokenizer.jpg" alt="Scenarios Extension Preview" width="800"/>
+</p>
+
 ## Eng ReadMe
 <details>
 
