@@ -19,7 +19,21 @@
 
         setupDraggable(panelElement);
         loadPosition(panelElement);
+        watchTheme();
     }
+
+    function watchTheme() {
+    new MutationObserver(() => {
+        if (panelElement) {
+            panelElement.style.display = 'none';
+            panelElement.offsetHeight;
+            panelElement.style.display = '';
+        }
+    }).observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['style', 'class']
+    });
+}
 
     function setupDraggable(el) {
         const onStart = (e) => {
