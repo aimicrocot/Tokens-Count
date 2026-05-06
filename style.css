@@ -4,9 +4,7 @@
     left: 20px;
     z-index: 99999;
 
-    /* Берём скругление у реальных блоков ST */
     border-radius: var(--border-radius-default, var(--border-radius, 8px));
-
     padding: 1px 6px;
     font-family: var(--mainFontFamily, 'Segoe UI', sans-serif);
     font-size: 13px;
@@ -17,17 +15,23 @@
     letter-spacing: normal;
     transition: opacity 0.2s, transform 0.1s;
 
-    /* Фон — цвет темы, но с фиксированной прозрачностью 0.55 поверх */
     background: color-mix(in srgb, var(--SmartThemeBlurTintColor, #888) 55%, transparent);
     backdrop-filter: blur(calc(var(--SmartThemeBlurStrength, 1) * 12px));
     -webkit-backdrop-filter: blur(calc(var(--SmartThemeBlurStrength, 1) * 12px));
 
     color: var(--SmartThemeBodyColor, rgba(255, 255, 255, 0.85));
 
-    /* Более заметная рамка — решает проблему со светлым фоном */
+    /* Лёгкая тень как была */
     border: 1px solid color-mix(in srgb, var(--SmartThemeBorderColor, #888) 60%, transparent);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.1) inset;
+}
 
-    box-shadow: 0 4px 12px var(--SmartThemeShadowColor, rgba(0, 0, 0, 0.2));
+/* Для светлой темы — более тёмная рамка и видимая тень */
+@media (prefers-color-scheme: light) {
+    .token-tracker-panel {
+        border-color: rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
 }
 
 .token-tracker-panel.dragging {
