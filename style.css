@@ -7,8 +7,9 @@
     border-radius: var(--border-radius-default, var(--border-radius, 8px));
     padding: 1px 6px;
     font-family: var(--mainFontFamily, 'Segoe UI', sans-serif);
-    font-size: 13px;
-    font-weight: 500;
+    font-size: clamp(11px, var(--mainFontSize, 13px), 15px);
+    font-weight: var(--mainFontWeight, 500);
+    color: var(--SmartThemeBodyColor, rgba(255, 255, 255, 0.85));
     text-align: center;
     cursor: grab;
     user-select: none;
