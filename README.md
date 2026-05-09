@@ -9,15 +9,14 @@
 
 ### About
 
-Updated! Now it counts absolutely all spent tokens with maximum accuracy. It takes the number of tokens from the Prompt Itemization section, specifically from Total Tokens in Prompt.
-The most minimalistic token counter for SillyTavern (from those I saw). Shows only one number, the number of tokens consumed in the chat context.
+Updated! It shows the number of tokens for your current request, including the system prompt, chat history, and everything that will be included in the next API call. The token count is taken from the Prompt Itemization section, specifically from Total Tokens in Prompt.
 
 ### Features
 
-- A small semi-transparent rounded capsule in a glassmorphism style, unobtrusive and easy to move around
-- Minimalism, no extra elements, just the counter
-- Draggable in any section of SillyTavern
-- If a dash appears in the capsule, check the bot's most recent message to ensure the Prompt Itemization button is present; when it is present, the number of tokens spent is transmitted starting from the bot’s second message in the chat
+- A small, semi-transparent rounded capsule in a glassmorphism style; unobtrusive and easy to move around in any section of SillyTavern
+- The capsule design automatically adapts to the look of your current theme
+- Minimalist design: just a single number, no unnecessary elements
+- If you see a dash displayed in the capsule, simply continue the chat and occasionally check that the Prompt Itemization button appears in the bot’s latest message; once it appears, the spent token count will start being pulled from there beginning with the second bot message in the chat
 
 ### Installation
 
@@ -38,15 +37,14 @@ https://github.com/SunKatz05/Chat-Tracker-ST</details>
 
 ### О расширении
 
-Обновлено! Теперь максимально точное, считает абсолютно все потраченныые токены. Берёт число токенов из раздела Prompt Itemization, а именно из Total Tokens in Prompt.
-Самый минималистичный счётчик токенов (из встреченных мной) для SillyTavern. Показывает только одно число, количество токенов, потраченных вами.
+Обновлено! Теперь максимально точное. Показывает количество токенов для вашего текущего одного запроса, то есть системный промпт + история чата + всё, что войдёт в следующий вызов API. Берёт число токенов из раздела Prompt Itemization, а именно из Total Tokens in Prompt.
 
 ### Особенности
 
-- Маленькая и полупрозрачная скруглённая капсула в стиле глассморфизм, не отвлекает, легко перемещается
-- Минимализм, никаких прочих элементов, только потраченные токены
-- Перетаскивание в любом разделе SillyTavern
-- Если у вас отображается прочерк в капсуле, проверьте последнее сообщение от бота, что кнопка Prompt Itemization есть; когда она есть, то передаётся число потраченных токенов начиная со 2 сообщения бота в чате
+- Маленькая, полупрозрачная скруглённая капсула в стиле глассморфизм, не отвлекает, легко перемещается в любом разделе SillyTavern
+- Дизайн капсулы автоматически подстраивается под вид вашей темы
+- Минимализм, только одно число, никаких лишних элементов
+- Если у вас отображается прочерк в капсуле, просто продолжайте чат, периодически проверяя в последнем сообщение от бота, что кнопка Prompt Itemization есть; когда она есть, то оттуда передаётся число потраченных токенов начиная со 2 сообщения бота в чате
 
 ### Установка
 
